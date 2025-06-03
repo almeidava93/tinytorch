@@ -20,9 +20,9 @@ class Linear(Module):
 
   def initialize_weights(self, method: str = 'random'):
     if method == 'random':
-      self.weight = Parameter(np.random.randn(self.out_features, self.in_features))
+      self.weight = Parameter(np.random.randn(self.in_features, self.out_features))
       if self.use_bias:
-        self.bias = Parameter(np.random.randn(self.out_features, 1))
+        self.bias = Parameter(np.random.randn(1, self.out_features))
     else:
       raise NotImplementedError
 
