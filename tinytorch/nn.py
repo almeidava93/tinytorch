@@ -1,0 +1,27 @@
+import numpy as np
+from tinytorch.module import Module
+from tinytorch.tensor import Tensor
+
+
+class Linear(Module):
+  def __init__(self, in_features: int, out_features: int, bias: bool = True):
+    self.in_features = in_features
+    self.out_features = out_features
+    self.weight: Tensor = None
+    self.bias: Tensor = None
+    self.use_bias: bool = bias
+
+  def __repr__(self):
+    return f'{self.__class__.__name__}(in_features={self.in_features}, out_features={self.out_features}, bias={self.use_bias}),'
+
+  def initialize_weights(self, method: str = 'random'):
+    if method == 'random':
+      self.weight = Tensor(np.random.randn(self.out_features, self.in_features))
+      if self.use_bias:
+        self.bias = Tensor(np.random.randn(self.out_features, 1))
+    else:
+      raise NotImplementedError
+
+  def forward(self, input: Tensor):
+    output = input @ self.weight + self.bias
+    return output
