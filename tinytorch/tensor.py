@@ -3,7 +3,7 @@ import numpy as np
 import tinytorch.grads as grads
 
 class Tensor():
-  def __init__(self, value, _children=(), _op='', label=None, requires_grad: bool = True):
+  def __init__(self, value, _children=(), _op='', label=None, requires_grad: bool = True, *args, **kwargs):
     self.value: np.array = np.array(value)
     self._children = _children
     self._op = _op
