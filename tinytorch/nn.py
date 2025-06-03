@@ -6,6 +6,7 @@ from tinytorch.tensor import Tensor
 
 class Linear(Module):
   def __init__(self, in_features: int, out_features: int, bias: bool = True):
+    super().__init__()
     self.in_features = in_features
     self.out_features = out_features
     self.weight: Parameter = None
@@ -15,7 +16,7 @@ class Linear(Module):
     self.initialize_weights()
 
   def __repr__(self):
-    return f'{self.__class__.__name__}(in_features={self.in_features}, out_features={self.out_features}, bias={self.use_bias}),'
+    return f'{self.__class__.__name__}(in_features={self.in_features}, out_features={self.out_features}, bias={self.use_bias})'
 
   def initialize_weights(self, method: str = 'random'):
     if method == 'random':
