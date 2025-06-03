@@ -1,9 +1,20 @@
 import numpy as np
 from tinytorch.module import Module
-from tinytorch.parameter import Parameter
+
+from abc import ABC, abstractmethod
+
+class Optimizer(ABC):
+  @abstractmethod
+  def step(self):
+    pass
+
+  @abstractmethod
+  def zero_grad(self):
+    pass
 
 
-class Optimizer:
+
+class SGD(Optimizer):
   def __init__(self, model: Module, learning_rate: float):
     self.model = model
     self.learning_rate = learning_rate
