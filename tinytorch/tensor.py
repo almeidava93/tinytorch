@@ -95,14 +95,12 @@ class Tensor():
 
   def __matmul__(self, other):
     if not isinstance(other, Tensor): other = Tensor(other)
-    print(f"Self value shape: {self.value.shape}, type: {type(self.value)}")
-    print(f"Other value shape: {other.value.shape}, type: {type(other.value)}")
     # Compute the output
     output = Tensor(self.value @ other.value, _children=(self, other), _op='matmul')
     # Define gradient function
     output._backward = grads.grad_fn_matmul
     return output
-
+  
   def sum(self):
     output = Tensor(self.value.sum(), _children=(self,), _op='sum')
     output._backward = grads.grad_fn_sum
