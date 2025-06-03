@@ -1,9 +1,10 @@
+from typing import List
 import numpy as np
 
 import tinytorch.grads as grads
 
 class Tensor():
-  def __init__(self, value, _children=(), _op='', label=None, requires_grad: bool = True, *args, **kwargs):
+  def __init__(self, value, _children=(), _op='', label=None, requires_grad: bool = True, retain_grads: bool = False, *args, **kwargs):
     self.value: np.array = np.array(value)
     self._children = _children
     self._op = _op
@@ -11,6 +12,7 @@ class Tensor():
     self.grad = np.zeros_like(self.value, dtype=np.float64)
     self.label = label
     self.requires_grad = requires_grad
+    self.retain_grads = retain_grads
 
   def __repr__(self):
     return f'Tensor(value={self.value}{", label="+self.label if self.label else ""}{", op="+self._op if self._op else ""}{", requires_grad="+str(self.requires_grad)})'
@@ -143,7 +145,7 @@ class Tensor():
     # Start ordering from the last node
     topo_sort(self)
     # Reverse de order to do backward
-    r_ordered_nodes = reversed(ordered_nodes)
+    r_ordered_nodes: List[Tensor] = reversed(ordered_nodes)
 
     # Call _backward on every node in reversed topological order
     for node in r_ordered_nodes:
@@ -151,8 +153,15 @@ class Tensor():
 
       grads = node._backward(node.grad, *[child.value for child in node._children])
 
+      if node.retain_grads == False:
+        node.grad = np.zeros_like(node.value, dtype=np.float64)
+
       for child, grad in zip(node._children, grads):
-        if child.grad.shape != grad.shape:
-          child.grad += grad.sum()
-        else:
-          child.grad += grad
+        for idx, (a_i, b_i) in enumerate(zip(reversed(child.grad.shape), reversed(grad.shape))):
+          idx = -1*idx - 1
+          if (a_i != b_i) and (a_i != 1) and (b_i != 1):
+            raise ValueError(f'Cannot broadcast {child.grad.shape} and {grad.shape}.')
+          elif (a_i == 1):
+            grad = grad.sum(axis=idx, keepdims=True)
+
+        child.grad += grad
