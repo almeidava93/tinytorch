@@ -44,3 +44,19 @@ def grad_fn_sum(output_grad: np.array = None, first_value: np.array = None, seco
   Derivative of the sum operation. Applies chain rule to the input gradients by multiplying with the output gradient.
   """
   return np.full_like(first_value, output_grad), None
+
+def grad_fn_sigmoid(output_grad: np.array = None, first_value: np.array = None, second_value: np.array = None) -> tuple[np.array]:
+  """
+  Derivative of the sigmoid operation. Applies chain rule to the input gradients by multiplying with the output gradient.
+  """
+  sigmoid = lambda x: 1/(1+np.exp(-x))
+  return sigmoid(first_value)*(1-sigmoid(first_value))*output_grad,
+
+def grad_fn_silu(output_grad: np.array = None, first_value: np.array = None, second_value: np.array = None) -> tuple[np.array]:
+  """
+  Derivative of the SiLU operation. Applies chain rule to the input gradients by multiplying with the output gradient.
+  """
+  sigmoid = lambda x: 1/(1+np.exp(-x))
+  x = first_value
+  silu_grad = sigmoid(x) + x*sigmoid(x)*(1-sigmoid(x))
+  return silu_grad*output_grad,
