@@ -30,3 +30,22 @@ class Linear(Module):
   def forward(self, input: Tensor):
     output = input @ self.weight + self.bias
     return output
+  
+
+class Sequential(Module):
+  def __init__(self, modules: list[Module]):
+    super().__init__()
+    self.modules = modules
+
+  def __repr__(self):
+    if len(self.modules) == 0:
+      return f'{self.__class__.__name__}([])'
+    
+    modules_str = '\n\t' +  '\n\t'.join([m.__repr__() + ',' for m in self.modules]) + '\n'
+    return f'{self.__class__.__name__}([{modules_str}])'
+  
+  def forward(self, input: Tensor):
+    output = input
+    for module in self.modules:
+      output = module(output)
+    return output
