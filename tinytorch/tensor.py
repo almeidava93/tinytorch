@@ -155,7 +155,10 @@ class Tensor():
 
     # Call _backward on every node in reversed topological order
     for node in r_ordered_nodes:
-      if node._backward is None: continue
+      # skip if there is no _backward function defined
+      if node._backward is None: continue 
+      # skip if does not require gradients
+      if node.requires_grad == False: continue 
 
       grads = node._backward(node.grad, *[child.value for child in node._children])
 
