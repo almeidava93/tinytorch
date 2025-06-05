@@ -60,3 +60,9 @@ def grad_fn_silu(output_grad: np.array = None, first_value: np.array = None, sec
   x = first_value
   silu_grad = sigmoid(x) + x*sigmoid(x)*(1-sigmoid(x))
   return silu_grad*output_grad,
+
+def grad_fn_transpose(output_grad: np.array = None, first_value: np.array = None, second_value: np.array = None) -> tuple[np.array]:
+  """
+  Derivative of the transpose operation. Applies chain rule to the input gradients by multiplying with the output gradient.
+  """
+  return output_grad.T

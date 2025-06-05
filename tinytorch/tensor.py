@@ -115,12 +115,20 @@ class Tensor():
     output = self * other
     output = output.sum()
     return output
+  
+  def T(self):
+    output = Tensor(self.value.T, _children=(self,), _op='T')
+    output._backward = grads.grad_fn_transpose
+    return output
 
   def to_dict(self):
     return {
         'value': self.value,
         'grad': self.grad,
-        'label': self.label
+        'label': self.label,
+        'requires_grad': self.requires_grad,
+        'retain_grads': self.retain_grads,
+        'op': self._op
     }
 
   @property
