@@ -112,3 +112,66 @@ class Adam(Optimizer):
 
       # Update weights
       param.value = param.value - self.learning_rate * (m_hat / (np.sqrt(v_hat) + self.epsilon))
+
+
+class AdamW(Optimizer):
+  """
+  Adam with decoupled weight decay Optimization (AdamW)
+  """
+  def __init__(self, 
+               model: Module, 
+               learning_rate: float, 
+               beta1: float = 0.9, 
+               beta2: float = 0.999, 
+               weight_decay: float = 1e-6,
+               schedule_multiplier: float = 1.0, 
+               epsilon: float = 1e-8,
+               ):
+    self.model = model
+    self.learning_rate = learning_rate
+    self.beta1 = beta1
+    self.beta2 = beta2
+    self.weight_decay = weight_decay # lambda in the paper
+    self.schedule_multiplier = schedule_multiplier # eta_t in the paper
+    self.epsilon = epsilon
+    self.time = 0
+
+    # Initialize variables to store moving avg and squared gradients weighted average
+    self.m = []
+    self.v = []
+
+    for param in self.model.parameters():
+      self.m.append(np.zeros_like(param.value))
+      self.v.append(np.zeros_like(param.value))
+
+  def step_schedule_multiplier(self):
+    "This method may be overrided to update the schedule multiplier as a function of time. Defaults to a constant schedule multiplier = 1.0."
+    pass
+
+  def step(self):
+    self.time += 1
+    self.step_schedule_multiplier()
+
+    for idx, param in enumerate(self.model.parameters()):
+      # Get previous averages
+      m = self.m[idx]
+      v = self.v[idx]
+
+      # Update moving average
+      m = self.beta1 * m + (1-self.beta1)*param.grad
+      # Update squared gradients weighted average
+      v = self.beta2 * v + (1-self.beta2)*(param.grad**2)
+
+      # Update averages tracking
+      self.m[idx] = m
+      self.v[idx] = v
+
+      # Apply bias correction
+      m_hat = m / (1 - self.beta1**self.time)
+      v_hat = v / (1 - self.beta2**self.time)
+
+      # Update weights
+      param.value = param.value - self.schedule_multiplier * (
+          self.learning_rate * (m_hat / (np.sqrt(v_hat) + self.epsilon)) +
+          self.weight_decay * param.value
+        )
