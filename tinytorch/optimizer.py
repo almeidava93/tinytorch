@@ -48,6 +48,8 @@ class Adam(Optimizer):
       self.v.append(np.zeros_like(param.value))
 
   def step(self):
+    self.time += 1
+
     for idx, param in enumerate(self.model.parameters()):
       # Get previous averages
       m = self.m[idx]
@@ -63,13 +65,12 @@ class Adam(Optimizer):
       self.v[idx] = v
 
       # Apply bias correction
-      m_hat = m / (1 - self.beta1**self.time + self.epsilon) # epsilon to avoid division by zero
-      v_hat = v / (1 - self.beta2**self.time + self.epsilon)
+      m_hat = m / (1 - self.beta1**self.time)
+      v_hat = v / (1 - self.beta2**self.time)
 
       # Update weights
       param.value = param.value - self.learning_rate * (m_hat / (np.sqrt(v_hat) + self.epsilon))
 
-    self.time += 1
 
   def zero_grad(self):
     for param in self.model.parameters():
