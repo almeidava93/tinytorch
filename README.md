@@ -33,3 +33,19 @@ The `Scheduler` object controls dynamic changes in the learning_rate. The implem
 ### `Module` object and neural network predefined layers
 The `Module` object is the building block of neural networks. It defines a blueprint for every Module implemented. Includes parameter and submodule tracking, meaningful printer of the structure of each module and requires the implementation of a forward method for the forward pass. Also, it allows an arbritary composition of modules, allowing for great flexibility in building model architectures. Predefined layers built on top of the `Module` class includes:
 - `Linear`
+
+### Parameters initialization
+Several techniques exist for weight initialization in neural networks. The `tinytorch.init` module contains a series of methods. By default, the Xavier uniform initialization method is used. This default can be changed in two ways:
+- setting a new global default method using `tinytorch.set_init_method` function. 
+- writing a custom `initialize_weights` method in your tinytorch Module.
+
+The initialization methods enabled in this project are:
+- `uniform`
+- `normal`
+- `constant`
+- `ones`
+- `zeros`
+- `xavier_uniform`
+- `xavier_normal`
+- `kaiming_uniform`
+- `kaiming_normal`
