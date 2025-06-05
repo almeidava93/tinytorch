@@ -1,3 +1,5 @@
+# See https://www.datacamp.com/tutorial/adam-optimizer-tutorial
+
 import numpy as np
 from tinytorch.module import Module
 
@@ -8,12 +10,15 @@ class Optimizer(ABC):
   def step(self):
     pass
 
-  @abstractmethod
   def zero_grad(self):
     for param in self.model.parameters():
       param.grad = np.zeros_like(param.value, dtype=np.float64)
 
+
 class SGD(Optimizer):
+  """
+  Stochastic Gradient Descent (SGD)
+  """
   def __init__(self, model: Module, learning_rate: float, momentum: float = 0.0):
     self.model = model
     self.learning_rate = learning_rate
@@ -28,7 +33,6 @@ class SGD(Optimizer):
 
   def step(self):
     for idx, param in enumerate(self.model.parameters()):
-
       if self.momentum > 0:
         m = self.m[idx]
         m = self.momentum*m + self.learning_rate*param.grad
@@ -38,14 +42,36 @@ class SGD(Optimizer):
 
       param.value = param.value - self.learning_rate * param.grad
 
-  def zero_grad(self):
+
+class RMSProp(Optimizer):
+  """
+  Root Mean Square Propagation (RMSProp)
+  """
+  def __init__(self, model: Module, learning_rate: float, beta: float = 0.9, epsilon: float = 1e-8):
+    self.model = model
+    self.learning_rate = learning_rate
+    self.beta = beta
+    self.epsilon = epsilon
+
+    # Store moving average of previous squared gradients 
+    self.m = []
+
+    # Initialize them with zeros
     for param in self.model.parameters():
-      param.grad = np.zeros_like(param.value, dtype=np.float64)
+      self.m.append(np.zeros_like(param.value))
+
+  def step(self):
+    for idx, param in enumerate(self.model.parameters()):
+      m = self.m[idx]
+      m = m*self.beta + (1 - self.beta)*(param.grad**2)
+      self.m[idx] = m # update previous term
+
+      param.value = param.value - self.learning_rate*(param.grad/(np.sqrt(m) + self.epsilon))
 
 
 class Adam(Optimizer):
   """
-  See https://www.datacamp.com/tutorial/adam-optimizer-tutorial
+  Adam Optimization
   """
   def __init__(self, model: Module, learning_rate: float, beta1: float = 0.9, beta2: float = 0.999, epsilon: float = 1e-8):
     self.model = model
@@ -86,8 +112,3 @@ class Adam(Optimizer):
 
       # Update weights
       param.value = param.value - self.learning_rate * (m_hat / (np.sqrt(v_hat) + self.epsilon))
-
-
-  def zero_grad(self):
-    for param in self.model.parameters():
-      param.grad = np.zeros_like(param.value, dtype=np.float64)
