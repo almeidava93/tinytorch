@@ -47,3 +47,9 @@ def xavier_normal(size: tuple = None, gain: float = 1.0, as_parameter: bool = Tr
     fan_out = size[1]
     bound = gain * np.sqrt(2/(fan_in + fan_out))
     return normal(size, 0, bound, as_parameter)
+
+def kaiming_uniform(*args, **kwargs):
+    raise NotImplementedError
+
+def kaiming__normal(*args, **kwargs):
+    raise NotImplementedError
