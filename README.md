@@ -17,3 +17,10 @@ Tensors do not store intermediate gradient values, except if they are Parameters
 
 ### Parameter
 A Parameter object is an extension of the tensor object used to define learnable parameters. These objects are updated by the optimizer. 
+
+### Optimizers
+Optimizers are objects that inherit from the abstract class `Optimizer`. They encapsulate the optimization algorithms used in deep learning. The implemented algorithms include:
+- Gradient Descent
+- Stochastic Gradient Descent
+- Root Mean Square Propagation (RMSProp)
+- Adam 
