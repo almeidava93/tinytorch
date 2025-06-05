@@ -31,7 +31,12 @@ def grad_fn_pow(output_grad: np.array = None, first_value: np.array = None, seco
   assert second_value.dtype == int, \
   f"The power must be an integer. Received type {second_value.dtype}, value {second_value}"
 
-  return second_value*first_value**(second_value-1)*output_grad, ((first_value**second_value)*np.log(first_value)*output_grad).sum()
+  first_value_grad = second_value*first_value**(second_value-1)*output_grad
+  second_value_grad = np.zeros_like(second_value)
+  if all(first_value>0):
+    second_value_grad = ((first_value**second_value)*np.log(first_value)*output_grad).sum()
+
+  return first_value_grad, second_value_grad
 
 def grad_fn_matmul(output_grad: np.array = None, first_value: np.array = None, second_value: np.array = None) -> tuple[np.array]:
   """
